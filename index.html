@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Epic Tech AI | Sovereign Nexus vΩ.∞</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -19,8 +20,8 @@
             </div>
             <div class="status-array">
                 <div class="status-item">
-                    <span class="label">CORE:</span>
-                    <span class="value" id="core-status">ACTIVE</span>
+                    <span class="label">NEURAL_STATE:</span>
+                    <span class="value" id="core-status">OPTIMAL</span>
                 </div>
                 <div class="status-item">
                     <span class="label">PROTOCOL:</span>
@@ -35,12 +36,12 @@
                     <path class="geometry-frame" d="M100 10 L180 55 L180 145 L100 190 L20 145 L20 55 Z" />
                     
                     <g id="neural-face">
-                        <path id="head-silhouette" d="M100,45 Q145,45 145,90 T100,160 T55,90 Q55,45 100,45" />
+                        <path id="head-silhouette" d="M100,45 Q145,45 145,90 T100,160 T55,90 Q55,45 100,45" fill="url(#gold-glow)" />
                         
                         <circle cx="75" cy="85" r="3" class="neural-node" />
                         <circle cx="125" cy="85" r="3" class="neural-node" />
                         
-                        <path id="mouth-morph" d="M80,125 Q100,125 120,125" />
+                        <path id="mouth-morph" d="M80,125 Q100,125 120,125" stroke="white" stroke-width="3" fill="none" stroke-linecap="round" />
                     </g>
 
                     <defs>
@@ -62,7 +63,7 @@
             </div>
 
             <div class="command-deck">
-                <input type="text" id="command-input" placeholder="Initiate Protocol..." autocomplete="off">
+                <input type="text" id="command-input" placeholder="Enter Command..." autocomplete="off">
                 <button id="transmit-btn">TRANSMIT</button>
             </div>
         </section>
