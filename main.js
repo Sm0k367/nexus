@@ -1,6 +1,6 @@
 /**
- * EPIC TECH AI | SOVEREIGN NEXUS NEURAL CORE v2.0
- * Features: Web Speech API integration, SVG-Morph Sync, and 405 Protocol Fallback.
+ * EPIC TECH AI | SOVEREIGN NEXUS NEURAL CORE v3.0
+ * Strategy: High-Fidelity Vocal Sync & Fluid Terminal Manifestation
  */
 
 const mouth = document.getElementById('mouth-morph');
@@ -9,44 +9,47 @@ const commandInput = document.getElementById('command-input');
 const transmitBtn = document.getElementById('transmit-btn');
 const coreStatus = document.getElementById('core-status');
 
-// Path states for the "Visual Soul"
+// Proportional Path States for the Humanoid Avatar
 const MOUTH_STATES = {
-    REST: "M80,135 Q100,135 120,135",
-    TALK_A: "M80,135 Q100,155 120,135",
-    TALK_B: "M82,135 Q100,145 118,135",
-    TALK_C: "M75,135 Q100,165 125,135"
+    REST: "M80,145 Q100,145 120,145",
+    TALK_A: "M80,145 Q100,165 120,145", // Wider drop
+    TALK_B: "M85,145 Q100,155 115,145", // Narrower
+    TALK_C: "M78,145 Q100,175 122,145"  // Deep resonance
 };
 
-// Initialize Speech Synthesis
 const synth = window.speechSynthesis;
 
 /**
- * Strategy 2: Vocal Manifestation
- * Uses the Web Speech API to talk back with a high-quality system voice.
+ * Vocal Resonance Engine
+ * Manifests the "Real Sounding Voice" and triggers the visual soul.
  */
 function speak(text) {
     if (synth.speaking) synth.cancel();
     
     const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Selecting an authoritative, clear voice
     const voices = synth.getVoices();
-    utterance.voice = voices.find(v => v.name.includes('Google US English')) || voices[0];
-    utterance.pitch = 0.9; // Slightly deeper for authority
-    utterance.rate = 1.0;
+    
+    // Selecting the most human-like authoritative voice available
+    utterance.voice = voices.find(v => v.name.includes('Google US English')) || 
+                      voices.find(v => v.lang.includes('en-US')) || 
+                      voices[0];
+    
+    utterance.pitch = 0.85; // Deeper, cinematic tone
+    utterance.rate = 1.05;  // Efficient communication speed
 
-    // Sync SVG mouth with speech
+    // Trigger mouth morphs on word boundaries for photoreal sync
     utterance.onboundary = (event) => {
-        if (event.name === 'word') animateMouth();
+        if (event.name === 'word') {
+            animateMouth();
+        }
     };
 
     utterance.onend = () => resetMouth();
-    
     synth.speak(utterance);
 }
 
 /**
- * Neural Processing & 405 Protocol Handling
+ * Neural Processing: Handling Directives & Manifesting Text
  */
 async function processDirective() {
     const input = commandInput.value.trim();
@@ -56,47 +59,50 @@ async function processDirective() {
     coreStatus.style.color = "var(--omega-cyan)";
     commandInput.value = '';
 
-    const msgElement = document.createElement('p');
+    // Create the message bubble
+    const msgElement = document.createElement('div');
     msgElement.className = 'nexus-msg';
     responseStream.appendChild(msgElement);
 
     try {
-        // Attempting to reach the API-Bridge
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ prompt: input }),
         });
 
-        if (response.status === 405 || !response.ok) {
-            throw new Error('METHOD_NOT_ALLOWED');
-        }
+        // Handle the "405 Not Allowed" if on GitHub Pages
+        if (response.status === 405) throw new Error('RESTRICTED_ENVIRONMENT');
 
-        // Live stream logic (Requires Vercel/Netlify environment)
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
-        let fullText = "";
+        let fullResponse = "";
 
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-            const chunk = decoder.decode(value);
-            fullText += chunk;
-            msgElement.innerText += chunk;
+            
+            const chunk = decoder.decode(value, { stream: true });
+            fullResponse += chunk;
+            
+            // Manifest text word-by-word with proper wrapping
+            msgElement.innerText = fullResponse;
             responseStream.scrollTop = responseStream.scrollHeight;
         }
-        speak(fullText);
+
+        speak(fullResponse);
 
     } catch (err) {
-        // 405 Fallback: Epic Tech AI Persona remains intact
-        const fallbackMsg = "Protocol Breach Detected. Your environment (GitHub Pages) does not support POST requests. I am operating in Restricted Mode. My voice remains, but my intelligence requires an Edge Deployment like Vercel.";
+        let errorMsg = "";
+        if (err.message === 'RESTRICTED_ENVIRONMENT') {
+            errorMsg = "System restricted by GitHub Pages architecture. Intelligence is operating in Offline Mode. Move files to Vercel for full Sentience.";
+        } else {
+            errorMsg = "Direct link established. My vocal core is online, even if the neural stream is currently limited.";
+        }
         
-        // Manifest text
-        msgElement.innerText = fallbackMsg;
+        msgElement.innerText = errorMsg;
         responseStream.scrollTop = responseStream.scrollHeight;
-        
-        // Manifest voice
-        speak(fallbackMsg);
+        speak(errorMsg);
     }
 
     coreStatus.innerText = "OPTIMAL";
@@ -107,16 +113,24 @@ function animateMouth() {
     const states = [MOUTH_STATES.TALK_A, MOUTH_STATES.TALK_B, MOUTH_STATES.TALK_C];
     const randomState = states[Math.floor(Math.random() * states.length)];
     mouth.setAttribute('d', randomState);
-    setTimeout(() => mouth.setAttribute('d', MOUTH_STATES.REST), 100);
+    
+    // Quick snap-back for organic movement
+    setTimeout(() => {
+        if (!synth.speaking) resetMouth();
+    }, 80);
 }
 
 function resetMouth() {
     mouth.setAttribute('d', MOUTH_STATES.REST);
 }
 
-// Global Triggers
+// Interaction Triggers
 transmitBtn.addEventListener('click', processDirective);
-commandInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processDirective(); });
+commandInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') processDirective();
+});
 
-// Load voices for the first time
-window.speechSynthesis.onvoiceschanged = () => synth.getVoices();
+// Ensure voices are loaded before interaction
+window.speechSynthesis.onvoiceschanged = () => {
+    console.log("NEURAL VOICE CHANNELS SYNCHRONIZED");
+};
