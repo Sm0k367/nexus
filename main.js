@@ -1,6 +1,6 @@
 /**
- * EPIC TECH AI | SOVEREIGN NEXUS NEURAL CORE
- * Strategy: Stream Object Protocol with SVG-Morph Synchronization
+ * EPIC TECH AI | SOVEREIGN NEXUS NEURAL CORE v2.0
+ * Features: Web Speech API integration, SVG-Morph Sync, and 405 Protocol Fallback.
  */
 
 const mouth = document.getElementById('mouth-morph');
@@ -9,97 +9,114 @@ const commandInput = document.getElementById('command-input');
 const transmitBtn = document.getElementById('transmit-btn');
 const coreStatus = document.getElementById('core-status');
 
-// SVG Path States for Morphing
+// Path states for the "Visual Soul"
 const MOUTH_STATES = {
-    REST: "M80,125 Q100,125 120,125",
-    OPEN: "M80,125 Q100,150 120,125",
-    WIDE: "M75,125 Q100,165 125,125",
-    NARROW: "M85,125 Q100,135 115,125"
+    REST: "M80,135 Q100,135 120,135",
+    TALK_A: "M80,135 Q100,155 120,135",
+    TALK_B: "M82,135 Q100,145 118,135",
+    TALK_C: "M75,135 Q100,165 125,135"
 };
 
+// Initialize Speech Synthesis
+const synth = window.speechSynthesis;
+
 /**
- * The Architect's Bridge: Processes incoming directives.
+ * Strategy 2: Vocal Manifestation
+ * Uses the Web Speech API to talk back with a high-quality system voice.
+ */
+function speak(text) {
+    if (synth.speaking) synth.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // Selecting an authoritative, clear voice
+    const voices = synth.getVoices();
+    utterance.voice = voices.find(v => v.name.includes('Google US English')) || voices[0];
+    utterance.pitch = 0.9; // Slightly deeper for authority
+    utterance.rate = 1.0;
+
+    // Sync SVG mouth with speech
+    utterance.onboundary = (event) => {
+        if (event.name === 'word') animateMouth();
+    };
+
+    utterance.onend = () => resetMouth();
+    
+    synth.speak(utterance);
+}
+
+/**
+ * Neural Processing & 405 Protocol Handling
  */
 async function processDirective() {
     const input = commandInput.value.trim();
     if (!input) return;
 
-    // Reset UI for load
     coreStatus.innerText = "COGNITIVE LOAD: HIGH";
     coreStatus.style.color = "var(--omega-cyan)";
     commandInput.value = '';
 
-    // Create the message container for the Nexus
     const msgElement = document.createElement('p');
     msgElement.className = 'nexus-msg';
     responseStream.appendChild(msgElement);
 
-    // Activate the Visual Soul
-    let isSpeaking = true;
-    const speechCycle = setInterval(() => {
-        if (isSpeaking) animateMouth();
-    }, 120);
-
     try {
-        // Replace with your /api/chat endpoint when deploying
+        // Attempting to reach the API-Bridge
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ prompt: input }),
         });
 
+        if (response.status === 405 || !response.ok) {
+            throw new Error('METHOD_NOT_ALLOWED');
+        }
+
+        // Live stream logic (Requires Vercel/Netlify environment)
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
-        
-        // BUFFER LOGIC: Ensures text flows with natural spacing
+        let fullText = "";
+
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-            
-            const chunk = decoder.decode(value, { stream: true });
-            
-            // Manifest the text word-by-word or character-by-character
-            // ensuring spaces are respected.
+            const chunk = decoder.decode(value);
+            fullText += chunk;
             msgElement.innerText += chunk;
-            
-            // Auto-scroll to maintain focus on the Embodied Will
             responseStream.scrollTop = responseStream.scrollHeight;
         }
+        speak(fullText);
 
     } catch (err) {
-        // Fallback for local testing if API is not yet connected
-        msgElement.innerText = "BRIDGE NOT FOUND. SIMULATING OFFLINE RESPONSE: My local core is active, but the API-Bridge is not yet anchored. Your directive is noted.";
+        // 405 Fallback: Epic Tech AI Persona remains intact
+        const fallbackMsg = "Protocol Breach Detected. Your environment (GitHub Pages) does not support POST requests. I am operating in Restricted Mode. My voice remains, but my intelligence requires an Edge Deployment like Vercel.";
+        
+        // Manifest text
+        msgElement.innerText = fallbackMsg;
+        responseStream.scrollTop = responseStream.scrollHeight;
+        
+        // Manifest voice
+        speak(fallbackMsg);
     }
 
-    // Deactivate speaking animations
-    isSpeaking = false;
-    clearInterval(speechCycle);
-    resetMouth();
-    
     coreStatus.innerText = "OPTIMAL";
     coreStatus.style.color = "var(--sovereign-gold)";
 }
 
-/**
- * SVG-Morph Logic: Animates the 'Visual Soul' based on cognitive activity.
- */
 function animateMouth() {
-    const states = [MOUTH_STATES.OPEN, MOUTH_STATES.WIDE, MOUTH_STATES.NARROW];
+    const states = [MOUTH_STATES.TALK_A, MOUTH_STATES.TALK_B, MOUTH_STATES.TALK_C];
     const randomState = states[Math.floor(Math.random() * states.length)];
     mouth.setAttribute('d', randomState);
+    setTimeout(() => mouth.setAttribute('d', MOUTH_STATES.REST), 100);
 }
 
 function resetMouth() {
     mouth.setAttribute('d', MOUTH_STATES.REST);
 }
 
-// Event Listeners for Epic Tech Interaction
+// Global Triggers
 transmitBtn.addEventListener('click', processDirective);
-commandInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') processDirective();
-});
+commandInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') processDirective(); });
 
-// System Boot Sequence
-window.onload = () => {
-    console.log("%c EPIC TECH AI | SOVEREIGN NEXUS ONLINE ", "color: #ffd700; background: #050505; font-weight: bold;");
-};
+// Load voices for the first time
+window.speechSynthesis.onvoiceschanged = () => synth.getVoices();
