@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Epic Tech AI | Sovereign Nexus vΩ.∞</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
@@ -19,33 +19,35 @@
                 <span class="brand-suffix">AI</span>
             </div>
             <div class="status-array">
-                <div class="status-item"><span class="label">NEURAL_STATE:</span><span class="value" id="core-status">OPTIMAL</span></div>
-                <div class="status-item"><span class="label">VOICE_LINK:</span><span class="value">SYNCHRONIZED</span></div>
+                <div class="status-item"><span class="label">NEURAL:</span> <span class="value" id="core-status">OPTIMAL</span></div>
             </div>
         </header>
 
         <section class="visual-soul-hub">
             <div class="avatar-container">
                 <div class="photoreal-mask">
-                    <img src="https://plus.unsplash.com/premium_photo-1683121710572-7723bd2e235d?q=80&w=1000&auto=format&fit=crop" id="avatar-img" alt="Sovereign Core">
+                    <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=800" id="avatar-img" alt="Sovereign Core">
                     <div class="scanline-overlay"></div>
                     <svg id="mouth-overlay" viewBox="0 0 200 200">
                         <path id="mouth-morph" d="M80,145 Q100,145 120,145" stroke="var(--omega-cyan)" stroke-width="3" fill="none" />
                     </svg>
                 </div>
-                <div class="orbital-rings"></div>
             </div>
         </section>
 
         <section class="hud-bridge">
-            <div class="terminal-output" id="response-stream">
-                <p class="system-msg">>> SYSTEM_BOOT: SUCCESSFUL</p>
-                <p class="nexus-msg">Welcome, Architect. My visual form and vocal core are now synchronized. State your directive.</p>
+            <div class="terminal-view">
+                <div class="terminal-output" id="response-stream">
+                    <p class="system-msg">>> SOVEREIGN_NEXUS_v4.0_ACTIVE</p>
+                    <div class="nexus-msg">Welcome, Architect. My interface is now adaptive across all neural planes. State your directive.</div>
+                </div>
             </div>
 
             <div class="command-deck">
-                <input type="text" id="command-input" placeholder="State your intent..." autocomplete="off">
-                <button id="transmit-btn">TRANSMIT</button>
+                <input type="text" id="command-input" placeholder="Initiate Protocol..." autocomplete="off">
+                <button id="transmit-btn">
+                    <span class="btn-text">TRANSMIT</span>
+                </button>
             </div>
         </section>
 
