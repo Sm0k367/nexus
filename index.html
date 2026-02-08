@@ -11,15 +11,14 @@
 
     <div class="aura-field"></div>
 
-    <main class="epic-interface">
-        
+    <div class="viewport-wrapper">
         <header class="system-header">
             <div class="brand-block">
                 <span class="brand-prefix">EPIC TECH</span>
                 <span class="brand-suffix">AI</span>
             </div>
             <div class="status-array">
-                <div class="status-item"><span class="label">NEURAL:</span> <span class="value" id="core-status">OPTIMAL</span></div>
+                <span class="label">NEURAL:</span> <span class="value" id="core-status">ONLINE</span>
             </div>
         </header>
 
@@ -36,22 +35,17 @@
         </section>
 
         <section class="hud-bridge">
-            <div class="terminal-view">
-                <div class="terminal-output" id="response-stream">
-                    <p class="system-msg">>> SOVEREIGN_NEXUS_v4.0_ACTIVE</p>
-                    <div class="nexus-msg">Welcome, Architect. My interface is now adaptive across all neural planes. State your directive.</div>
-                </div>
+            <div id="response-stream" class="terminal-output">
+                <p class="system-msg">>> SYSTEM_STABILIZED: v4.0</p>
+                <div class="nexus-msg">Welcome, Architect. My interface is now anchored to your device's viewport. Text will flow without shifting the world. State your directive.</div>
             </div>
 
             <div class="command-deck">
-                <input type="text" id="command-input" placeholder="Initiate Protocol..." autocomplete="off">
-                <button id="transmit-btn">
-                    <span class="btn-text">TRANSMIT</span>
-                </button>
+                <input type="text" id="command-input" placeholder="State intent..." autocomplete="off">
+                <button id="transmit-btn">TRANSMIT</button>
             </div>
         </section>
-
-    </main>
+    </div>
 
     <script src="main.js"></script>
 </body>
