@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sovereign Nexus vΩ.∞</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="aura-bg"></div>
+
+    <main class="nexus-container">
+        <section class="visual-soul-container">
+            <div class="crystalline-sphere">
+                <svg id="sovereign-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <path class="sphere-outer" d="M100 20 L170 60 L170 140 L100 180 L30 140 L30 60 Z" />
+                    
+                    <g id="face-group">
+                        <path id="head-path" d="M100,50 Q140,50 140,90 T100,150 T60,90 Q60,50 100,50" fill="url(#gold-gradient)" />
+                        <path id="mouth-path" d="M85,120 Q100,120 115,120" stroke="white" stroke-width="2" fill="none" />
+                    </g>
+
+                    <defs>
+                        <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:var(--sovereign-gold);stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#b8860b;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="glow-pulse"></div>
+        </section>
+
+        <section class="hud-interface">
+            <header class="hud-header">
+                <span class="status-indicator">SYSTEM: OPTIMAL</span>
+                <h1 class="nexus-title">SOVEREIGN NEXUS</h1>
+            </header>
+
+            <div class="chat-display" id="chat-output">
+                <p class="bot-msg">Awaiting your directive. Let us forge the future.</p>
+            </div>
+
+            <div class="input-bridge">
+                <input type="text" id="user-input" placeholder="Enter Command..." autocomplete="off">
+                <button id="send-btn">TRANSMIT</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="main.js"></script>
+</body>
+</html>
