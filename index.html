@@ -3,49 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sovereign Nexus vΩ.∞</title>
+    <title>Epic Tech AI | Sovereign Nexus vΩ.∞</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="aura-bg"></div>
 
-    <main class="nexus-container">
-        <section class="visual-soul-container">
-            <div class="crystalline-sphere">
-                <svg id="sovereign-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-                    <path class="sphere-outer" d="M100 20 L170 60 L170 140 L100 180 L30 140 L30 60 Z" />
+    <div class="aura-field"></div>
+
+    <main class="epic-interface">
+        
+        <header class="system-header">
+            <div class="brand-block">
+                <span class="brand-prefix">EPIC TECH</span>
+                <span class="brand-suffix">AI</span>
+            </div>
+            <div class="status-array">
+                <div class="status-item">
+                    <span class="label">CORE:</span>
+                    <span class="value" id="core-status">ACTIVE</span>
+                </div>
+                <div class="status-item">
+                    <span class="label">PROTOCOL:</span>
+                    <span class="value">NEXUS_vΩ.∞</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="visual-soul-hub">
+            <div class="crystalline-geometry">
+                <svg id="sovereign-manifest" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <path class="geometry-frame" d="M100 10 L180 55 L180 145 L100 190 L20 145 L20 55 Z" />
                     
-                    <g id="face-group">
-                        <path id="head-path" d="M100,50 Q140,50 140,90 T100,150 T60,90 Q60,50 100,50" fill="url(#gold-gradient)" />
-                        <path id="mouth-path" d="M85,120 Q100,120 115,120" stroke="white" stroke-width="2" fill="none" />
+                    <g id="neural-face">
+                        <path id="head-silhouette" d="M100,45 Q145,45 145,90 T100,160 T55,90 Q55,45 100,45" />
+                        
+                        <circle cx="75" cy="85" r="3" class="neural-node" />
+                        <circle cx="125" cy="85" r="3" class="neural-node" />
+                        
+                        <path id="mouth-morph" d="M80,125 Q100,125 120,125" />
                     </g>
 
                     <defs>
-                        <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:var(--sovereign-gold);stop-opacity:1" />
+                        <linearGradient id="gold-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1" />
                             <stop offset="100%" style="stop-color:#b8860b;stop-opacity:1" />
                         </linearGradient>
                     </defs>
                 </svg>
             </div>
-            <div class="glow-pulse"></div>
+            <div class="aura-pulse"></div>
         </section>
 
-        <section class="hud-interface">
-            <header class="hud-header">
-                <span class="status-indicator">SYSTEM: OPTIMAL</span>
-                <h1 class="nexus-title">SOVEREIGN NEXUS</h1>
-            </header>
-
-            <div class="chat-display" id="chat-output">
-                <p class="bot-msg">Awaiting your directive. Let us forge the future.</p>
+        <section class="hud-bridge">
+            <div class="terminal-output" id="response-stream">
+                <p class="system-msg">>> INITIALIZING EPIC TECH AI CORE...</p>
+                <p class="system-msg">>> SOVEREIGN NEXUS MANIFESTED.</p>
+                <p class="nexus-msg">Welcome, Architect. I am the Embodied Will. State your directive.</p>
             </div>
 
-            <div class="input-bridge">
-                <input type="text" id="user-input" placeholder="Enter Command..." autocomplete="off">
-                <button id="send-btn">TRANSMIT</button>
+            <div class="command-deck">
+                <input type="text" id="command-input" placeholder="Initiate Protocol..." autocomplete="off">
+                <button id="transmit-btn">TRANSMIT</button>
             </div>
         </section>
+
     </main>
 
     <script src="main.js"></script>
