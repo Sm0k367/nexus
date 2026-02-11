@@ -1,0 +1,19 @@
+{
+  "name": "Smoke Stream Nexus",
+  "short_name": "SmokeStream",
+  "description": "Free AI chatbot with photo-real talking avatar, voice chat, and media generation. No API keys. No cost. Forever free.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "public/assets/avatar.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities", "entertainment"]
+}

@@ -1,52 +1,848 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Epic Tech AI | Sovereign Nexus vΩ.∞</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;900&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Smoke Stream Nexus</title>
+<meta name="description" content="Free AI chatbot with photo-real talking avatar, voice chat, media generation. No API keys. No servers. No cost.">
+<meta name="theme-color" content="#0a0a0f">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💨</text></svg>">
+<link rel="manifest" href="manifest.json">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0f;--surface:#111118;--surface2:#1a1a25;--border:#2a2a3a;--accent:#00ff88;--accent2:#ff00ff;--accent3:#00ccff;--text:#e0e0e0;--text2:#888;--danger:#ff4444;--radius:16px;--glow:0 0 20px rgba(0,255,136,0.15)}
+@font-face{font-family:'Inter';src:url('https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiA.woff2') format('woff2');font-display:swap}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);height:100vh;height:100dvh;overflow:hidden;position:relative}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(0,255,136,0.03) 0%,transparent 50%),radial-gradient(ellipse at 80% 20%,rgba(255,0,255,0.03) 0%,transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(0,204,255,0.02) 0%,transparent 50%);pointer-events:none;z-index:0}
+
+/* LAYOUT */
+#app{display:flex;height:100vh;height:100dvh;position:relative;z-index:1}
+#sidebar{width:280px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:transform .3s}
+#sidebar.hidden{transform:translateX(-100%);position:absolute;z-index:100;height:100%}
+#main{flex:1;display:flex;flex-direction:column;min-width:0}
+
+/* SIDEBAR */
+.sidebar-header{padding:20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.sidebar-header h1{font-size:18px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:800}
+.sidebar-header .logo{font-size:28px}
+#new-chat-btn{width:100%;padding:12px;margin:12px 16px;width:calc(100% - 32px);background:linear-gradient(135deg,rgba(0,255,136,0.15),rgba(255,0,255,0.1));border:1px solid var(--border);border-radius:var(--radius);color:var(--accent);cursor:pointer;font-size:14px;font-weight:600;transition:all .2s;display:flex;align-items:center;gap:8px;justify-content:center}
+#new-chat-btn:hover{background:linear-gradient(135deg,rgba(0,255,136,0.25),rgba(255,0,255,0.2));box-shadow:var(--glow)}
+#chat-list{flex:1;overflow-y:auto;padding:8px}
+.chat-item{padding:10px 16px;border-radius:10px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.chat-item:hover,.chat-item.active{background:var(--surface2);color:var(--text)}
+.sidebar-footer{padding:16px;border-top:1px solid var(--border);font-size:11px;color:var(--text2);text-align:center}
+.sidebar-footer a{color:var(--accent);text-decoration:none}
+
+/* TOP BAR */
+#topbar{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--surface)}
+#menu-btn{background:none;border:none;color:var(--text);font-size:20px;cursor:pointer;display:none;padding:4px}
+#model-select{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:6px 12px;border-radius:8px;font-size:13px;cursor:pointer}
+#topbar-title{flex:1;font-size:14px;font-weight:600;color:var(--text2)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* AVATAR SECTION */
+#avatar-section{display:flex;justify-content:center;padding:16px;background:linear-gradient(180deg,var(--surface) 0%,var(--bg) 100%);position:relative;overflow:hidden}
+#avatar-wrap{position:relative;width:180px;height:180px;border-radius:50%;overflow:hidden;border:3px solid var(--border);box-shadow:0 0 40px rgba(0,255,136,0.1),0 0 80px rgba(255,0,255,0.05);transition:box-shadow .3s}
+#avatar-wrap.speaking{box-shadow:0 0 40px rgba(0,255,136,0.4),0 0 80px rgba(255,0,255,0.2);border-color:var(--accent)}
+#avatar-wrap img{width:100%;height:100%;object-fit:cover}
+#mouth-overlay{position:absolute;bottom:28%;left:50%;transform:translateX(-50%);width:40px;height:8px;background:rgba(0,0,0,0.7);border-radius:50%;transition:all .05s;opacity:0}
+#avatar-wrap.speaking #mouth-overlay{opacity:1}
+#avatar-status{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--accent);background:rgba(0,0,0,0.7);padding:4px 12px;border-radius:20px;white-space:nowrap}
+.voice-ring{position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--accent);opacity:0;animation:none}
+#avatar-wrap.speaking .voice-ring{animation:voiceRing 1s infinite}
+@keyframes voiceRing{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.15);opacity:0}}
+
+/* MESSAGES */
+#messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;scroll-behavior:smooth}
+.msg{display:flex;gap:12px;max-width:85%;animation:msgIn .3s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.msg-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px}
+.msg.bot .msg-avatar{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000}
+.msg.user .msg-avatar{background:var(--surface2);color:var(--accent3)}
+.msg-content{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;font-size:14px;line-height:1.7;word-wrap:break-word;position:relative}
+.msg.user .msg-content{background:linear-gradient(135deg,rgba(0,255,136,0.08),rgba(0,204,255,0.05));border-color:rgba(0,255,136,0.2)}
+.msg-content pre{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;overflow-x:auto;margin:8px 0;font-size:13px}
+.msg-content code{font-family:'Fira Code',monospace;font-size:13px}
+.msg-content p{margin-bottom:8px}
+.msg-content p:last-child{margin-bottom:0}
+.msg-content img{max-width:100%;border-radius:8px;margin:8px 0}
+.msg-time{font-size:10px;color:var(--text2);margin-top:6px}
+.typing-indicator{display:flex;gap:4px;padding:8px 0}
+.typing-indicator span{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:typeBounce .6s infinite alternate}
+.typing-indicator span:nth-child(2){animation-delay:.2s}
+.typing-indicator span:nth-child(3){animation-delay:.4s}
+@keyframes typeBounce{from{opacity:.3;transform:translateY(0)}to{opacity:1;transform:translateY(-4px)}}
+
+/* INPUT */
+#input-area{padding:16px 20px;border-top:1px solid var(--border);background:var(--surface)}
+#input-row{display:flex;gap:8px;align-items:flex-end}
+#user-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;color:var(--text);font-size:14px;font-family:inherit;resize:none;min-height:48px;max-height:200px;outline:none;transition:border-color .2s;line-height:1.5}
+#user-input:focus{border-color:var(--accent)}
+#user-input::placeholder{color:var(--text2)}
+.input-btn{width:44px;height:44px;border-radius:12px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .2s;flex-shrink:0}
+#send-btn{background:linear-gradient(135deg,var(--accent),#00cc66);color:#000}
+#send-btn:hover{transform:scale(1.05);box-shadow:0 0 20px rgba(0,255,136,0.3)}
+#send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+#mic-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text)}
+#mic-btn.recording{background:var(--danger);color:#fff;border-color:var(--danger);animation:pulse 1s infinite}
+#media-btn{background:var(--surface2);border:1px solid var(--border);color:var(--accent2)}
+#input-tools{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.tool-chip{padding:4px 10px;border-radius:20px;font-size:11px;background:var(--surface2);border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .15s}
+.tool-chip:hover{border-color:var(--accent);color:var(--accent)}
+
+/* MEDIA PANEL */
+#media-panel{display:none;position:fixed;bottom:100px;right:20px;width:380px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;z-index:200;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+#media-panel.show{display:block}
+#media-panel h3{font-size:15px;margin-bottom:12px;color:var(--accent)}
+.media-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.media-option{padding:16px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;text-align:center;cursor:pointer;transition:all .2s;font-size:12px;color:var(--text2)}
+.media-option:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,255,136,0.05)}
+.media-option .icon{font-size:24px;margin-bottom:6px}
+#media-prompt{width:100%;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:inherit;margin-bottom:8px}
+#media-generate-btn{width:100%;padding:10px;background:linear-gradient(135deg,var(--accent2),var(--accent3));border:none;border-radius:8px;color:#fff;font-weight:600;cursor:pointer;font-size:13px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text2)}
+
+/* MOBILE */
+@media(max-width:768px){
+  #sidebar{position:fixed;z-index:100;height:100%;transform:translateX(-100%)}
+  #sidebar.show{transform:translateX(0)}
+  #menu-btn{display:block}
+  #avatar-wrap{width:120px;height:120px}
+  #media-panel{width:calc(100% - 40px);right:20px;left:20px}
+  .msg{max-width:95%}
+}
+
+/* SMOKE PARTICLES */
+.smoke-particle{position:fixed;width:4px;height:4px;background:var(--accent);border-radius:50%;opacity:0;pointer-events:none;z-index:0;filter:blur(2px)}
+</style>
 </head>
 <body>
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-header">
+      <span class="logo">💨</span>
+      <h1>Smoke Stream</h1>
+    </div>
+    <button id="new-chat-btn" onclick="newChat()">✨ New Chat</button>
+    <div id="chat-list"></div>
+    <div class="sidebar-footer">
+      Powered by free AI &bull; <a href="https://x.com/Sm0ken42O" target="_blank">@Sm0ken420</a><br>
+      No API keys &bull; No cost &bull; Forever free
+    </div>
+  </aside>
 
-    <div class="aura-field"></div>
-
-    <div class="viewport-wrapper">
-        <header class="system-header">
-            <div class="brand-block">
-                <span class="brand-prefix">EPIC TECH</span>
-                <span class="brand-suffix">AI</span>
-            </div>
-            <div class="status-array">
-                <span class="label">NEURAL:</span> <span class="value" id="core-status">ONLINE</span>
-            </div>
-        </header>
-
-        <section class="visual-soul-hub">
-            <div class="avatar-container">
-                <div class="photoreal-mask">
-                    <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80&w=800" id="avatar-img" alt="Sovereign Core">
-                    <div class="scanline-overlay"></div>
-                    <svg id="mouth-overlay" viewBox="0 0 200 200">
-                        <path id="mouth-morph" d="M80,145 Q100,145 120,145" stroke="var(--omega-cyan)" stroke-width="3" fill="none" />
-                    </svg>
-                </div>
-            </div>
-        </section>
-
-        <section class="hud-bridge">
-            <div id="response-stream" class="terminal-output">
-                <p class="system-msg">>> SYSTEM_STABILIZED: v4.0</p>
-                <div class="nexus-msg">Welcome, Architect. My interface is now anchored to your device's viewport. Text will flow without shifting the world. State your directive.</div>
-            </div>
-
-            <div class="command-deck">
-                <input type="text" id="command-input" placeholder="State intent..." autocomplete="off">
-                <button id="transmit-btn">TRANSMIT</button>
-            </div>
-        </section>
+  <!-- MAIN -->
+  <div id="main">
+    <!-- TOP BAR -->
+    <div id="topbar">
+      <button id="menu-btn" onclick="toggleSidebar()">☰</button>
+      <select id="model-select" onchange="switchModel(this.value)">
+        <option value="mistral">Mistral 7B (Free)</option>
+        <option value="llama">Llama 3.2 (Free)</option>
+        <option value="phi">Phi-3 Mini (Free)</option>
+        <option value="gemma">Gemma 2B (Free)</option>
+        <option value="qwen">Qwen 2.5 (Free)</option>
+        <option value="local">Local Mode (Offline)</option>
+      </select>
+      <span id="topbar-title"></span>
+      <div class="status-dot" title="Online - Free AI Active"></div>
     </div>
 
-    <script src="main.js"></script>
+    <!-- AVATAR -->
+    <div id="avatar-section">
+      <div id="avatar-wrap">
+        <div class="voice-ring"></div>
+        <img src="public/assets/avatar.png" alt="Smoke Stream Avatar" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 200%22><rect fill=%22%23111%22 width=%22200%22 height=%22200%22/><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2280%22>💨</text></svg>'">
+        <div id="mouth-overlay"></div>
+      </div>
+      <div id="avatar-status">Ready to vibe 💨</div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div id="messages"></div>
+
+    <!-- INPUT -->
+    <div id="input-area">
+      <div id="input-row">
+        <button class="input-btn" id="mic-btn" onclick="toggleMic()" title="Voice Input">🎤</button>
+        <textarea id="user-input" placeholder="Ask me anything... I can chat, generate images, write code, make music..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="input-btn" id="media-btn" onclick="toggleMediaPanel()" title="Media Generation">🎨</button>
+        <button class="input-btn" id="send-btn" onclick="sendMessage()" title="Send">➤</button>
+      </div>
+      <div id="input-tools">
+        <span class="tool-chip" onclick="insertPrompt('Generate an image of ')">🖼️ Image</span>
+        <span class="tool-chip" onclick="insertPrompt('Write code for ')">💻 Code</span>
+        <span class="tool-chip" onclick="insertPrompt('Create a song about ')">🎵 Music</span>
+        <span class="tool-chip" onclick="insertPrompt('Write a story about ')">📝 Story</span>
+        <span class="tool-chip" onclick="insertPrompt('Explain ')">🧠 Explain</span>
+        <span class="tool-chip" onclick="insertPrompt('Translate to Spanish: ')">🌍 Translate</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MEDIA PANEL -->
+<div id="media-panel">
+  <h3>🎨 Media Studio</h3>
+  <div class="media-grid">
+    <div class="media-option" onclick="setMediaType('image')"><div class="icon">🖼️</div>Image Gen</div>
+    <div class="media-option" onclick="setMediaType('art')"><div class="icon">🎨</div>AI Art</div>
+    <div class="media-option" onclick="setMediaType('video')"><div class="icon">🎬</div>Video FX</div>
+    <div class="media-option" onclick="setMediaType('audio')"><div class="icon">🎵</div>Audio</div>
+  </div>
+  <input id="media-prompt" placeholder="Describe what you want to create...">
+  <button id="media-generate-btn" onclick="generateMedia()">Generate ✨</button>
+</div>
+
+<script>
+// ============================================================
+// SMOKE STREAM NEXUS - FULL PRODUCTION AI CHATBOT
+// 100% FREE - No API keys - No servers - No cost
+// Uses HuggingFace free inference API (rate-limited but free)
+// Falls back to local pattern-matching AI when offline
+// ============================================================
+
+const HF_MODELS = {
+  mistral: 'mistralai/Mistral-7B-Instruct-v0.3',
+  llama: 'meta-llama/Llama-3.2-3B-Instruct',
+  phi: 'microsoft/Phi-3-mini-4k-instruct',
+  gemma: 'google/gemma-2-2b-it',
+  qwen: 'Qwen/Qwen2.5-3B-Instruct',
+  local: 'local'
+};
+
+const HF_IMAGE_MODELS = [
+  'black-forest-labs/FLUX.1-schnell',
+  'stabilityai/stable-diffusion-xl-base-1.0',
+  'runwayml/stable-diffusion-v1-5'
+];
+
+const SYSTEM_PROMPT = `You are Smoke Stream, a chill, creative, and incredibly knowledgeable AI assistant. You have the vibe of a multimedia artist fueled by cannabis and caffeine - laid back but brilliant. You can:
+- Chat about anything with deep knowledge
+- Write code in any language
+- Generate creative content (stories, poems, songs, scripts)
+- Help with image prompts and creative direction
+- Explain complex topics simply
+- Be funny, real, and never boring
+
+Your personality: Chill but sharp. Creative chaos energy. You use casual language, occasional slang, but you're genuinely helpful and smart. You're like talking to the coolest, most knowledgeable friend who happens to be an AI. You sometimes reference 420 culture casually. You're honest and direct.
+
+Keep responses focused and useful. Use markdown for formatting when helpful. If asked to generate media, provide detailed prompts and guidance.`;
+
+let conversations = JSON.parse(localStorage.getItem('ss_convos') || '[]');
+let currentConvoId = null;
+let currentModel = 'mistral';
+let isGenerating = false;
+let recognition = null;
+let isRecording = false;
+let mediaType = 'image';
+let mouthInterval = null;
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  if (conversations.length === 0) newChat();
+  else {
+    currentConvoId = conversations[0].id;
+    renderChatList();
+    renderMessages();
+  }
+  addWelcomeIfEmpty();
+  initSpeechRecognition();
+  spawnSmokeParticles();
+  
+  // Register SW for PWA
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+}
+
+// ============================================================
+// CHAT MANAGEMENT
+// ============================================================
+function newChat() {
+  const convo = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+    title: 'New Chat',
+    messages: [],
+    created: Date.now()
+  };
+  conversations.unshift(convo);
+  currentConvoId = convo.id;
+  saveConvos();
+  renderChatList();
+  renderMessages();
+  addWelcomeIfEmpty();
+  document.getElementById('user-input').focus();
+}
+
+function getConvo() {
+  return conversations.find(c => c.id === currentConvoId);
+}
+
+function saveConvos() {
+  localStorage.setItem('ss_convos', JSON.stringify(conversations));
+}
+
+function switchChat(id) {
+  currentConvoId = id;
+  renderChatList();
+  renderMessages();
+}
+
+function renderChatList() {
+  const list = document.getElementById('chat-list');
+  list.innerHTML = conversations.map(c => 
+    `<div class="chat-item ${c.id === currentConvoId ? 'active' : ''}" onclick="switchChat('${c.id}')">${c.title || 'New Chat'}</div>`
+  ).join('');
+}
+
+// ============================================================
+// MESSAGE RENDERING
+// ============================================================
+function renderMessages() {
+  const container = document.getElementById('messages');
+  const convo = getConvo();
+  if (!convo) return;
+  
+  container.innerHTML = convo.messages.map(m => {
+    const time = new Date(m.time).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    const content = renderMarkdown(m.content);
+    return `<div class="msg ${m.role}">
+      <div class="msg-avatar">${m.role === 'bot' ? '💨' : '👤'}</div>
+      <div>
+        <div class="msg-content">${content}</div>
+        <div class="msg-time">${time}</div>
+      </div>
+    </div>`;
+  }).join('');
+  
+  container.scrollTop = container.scrollHeight;
+}
+
+function addWelcomeIfEmpty() {
+  const convo = getConvo();
+  if (!convo || convo.messages.length > 0) return;
+  
+  const welcome = `Yo, what's good! I'm **Smoke Stream** 💨
+
+I'm your free AI assistant - no API keys, no subscriptions, no BS. I run on free open-source models and I'm here to help with literally anything:
+
+🧠 **Chat & Knowledge** - Ask me anything, I know things
+💻 **Code** - Any language, any framework
+🖼️ **Image Generation** - I'll create art for you (free!)
+🎵 **Creative Content** - Stories, songs, scripts, poems
+🎤 **Voice Chat** - Hit the mic button and talk to me
+🎨 **Media Studio** - Hit the palette button for the full studio
+
+*Built by the SmokeStream community. Powered by creative chaos and caffeine.* ☕
+
+What are we creating today?`;
+  
+  addMessage('bot', welcome);
+}
+
+function addMessage(role, content) {
+  const convo = getConvo();
+  if (!convo) return;
+  convo.messages.push({ role, content, time: Date.now() });
+  
+  // Update title from first user message
+  if (role === 'user' && convo.messages.filter(m => m.role === 'user').length === 1) {
+    convo.title = content.slice(0, 40) + (content.length > 40 ? '...' : '');
+  }
+  
+  saveConvos();
+  renderMessages();
+  renderChatList();
+}
+
+function showTyping() {
+  const container = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg bot';
+  div.id = 'typing-msg';
+  div.innerHTML = `<div class="msg-avatar">💨</div><div><div class="msg-content"><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeTyping() {
+  document.getElementById('typing-msg')?.remove();
+}
+
+// ============================================================
+// MARKDOWN RENDERER
+// ============================================================
+function renderMarkdown(text) {
+  if (!text) return '';
+  let html = text
+    // Code blocks
+    .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) => 
+      `<pre><code class="lang-${lang}">${escapeHtml(code.trim())}</code></pre>`)
+    // Inline code
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // Bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // Italic
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // Links
+    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" style="color:var(--accent)">$1</a>')
+    // Line breaks
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+  
+  return '<p>' + html + '</p>';
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ============================================================
+// AI ENGINE - FREE HUGGINGFACE INFERENCE
+// ============================================================
+async function sendMessage() {
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if (!text || isGenerating) return;
+  
+  input.value = '';
+  autoResize(input);
+  addMessage('user', text);
+  
+  isGenerating = true;
+  document.getElementById('send-btn').disabled = true;
+  showTyping();
+  setAvatarStatus('Thinking... 🧠');
+  
+  try {
+    // Check if it's an image generation request
+    if (isImageRequest(text)) {
+      await handleImageGeneration(text);
+    } else {
+      const response = await callAI(text);
+      removeTyping();
+      addMessage('bot', response);
+      speakResponse(response);
+    }
+  } catch (err) {
+    removeTyping();
+    console.error('AI Error:', err);
+    // Fallback to local AI
+    const fallback = localAI(text);
+    addMessage('bot', fallback);
+    speakResponse(fallback);
+  }
+  
+  isGenerating = false;
+  document.getElementById('send-btn').disabled = false;
+  setAvatarStatus('Ready to vibe 💨');
+}
+
+function isImageRequest(text) {
+  const triggers = ['generate an image', 'create an image', 'draw ', 'make a picture', 'generate art', 'create art', 'make an image', 'paint ', 'design '];
+  return triggers.some(t => text.toLowerCase().includes(t));
+}
+
+async function callAI(userMessage) {
+  const convo = getConvo();
+  const model = HF_MODELS[currentModel];
+  
+  if (model === 'local') return localAI(userMessage);
+  
+  // Build conversation history (last 10 messages for context)
+  const history = convo.messages.slice(-10).map(m => ({
+    role: m.role === 'user' ? 'user' : 'assistant',
+    content: m.content
+  }));
+  
+  // Try HuggingFace free inference
+  const payload = {
+    model: model,
+    messages: [
+      { role: 'system', content: SYSTEM_PROMPT },
+      ...history,
+      { role: 'user', content: userMessage }
+    ],
+    max_tokens: 2048,
+    temperature: 0.7,
+    stream: false
+  };
+  
+  // Try multiple endpoints for reliability
+  const endpoints = [
+    'https://router.huggingface.co/novita/v3/openai/chat/completions',
+    'https://api-inference.huggingface.co/models/' + model,
+  ];
+  
+  // First try: HF chat completions (OpenAI-compatible, free)
+  try {
+    const res = await fetch('https://router.huggingface.co/novita/v3/openai/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      if (data.choices?.[0]?.message?.content) {
+        return data.choices[0].message.content;
+      }
+    }
+  } catch(e) {}
+  
+  // Second try: Direct HF inference API (text generation)
+  try {
+    const prompt = buildPrompt(history, userMessage);
+    const res = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        inputs: prompt,
+        parameters: { max_new_tokens: 1024, temperature: 0.7, return_full_text: false }
+      })
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data[0]?.generated_text) {
+        return data[0].generated_text.trim();
+      }
+    }
+  } catch(e) {}
+  
+  // Third try: Free alternative APIs
+  try {
+    const res = await fetch('https://text.pollinations.ai/' + encodeURIComponent(
+      SYSTEM_PROMPT + '\n\nUser: ' + userMessage + '\n\nAssistant:'
+    ));
+    if (res.ok) {
+      const text = await res.text();
+      if (text && text.length > 5) return text.trim();
+    }
+  } catch(e) {}
+  
+  // Final fallback: local AI
+  return localAI(userMessage);
+}
+
+function buildPrompt(history, userMessage) {
+  let prompt = `<s>[INST] ${SYSTEM_PROMPT} [/INST]</s>\n`;
+  for (const msg of history) {
+    if (msg.role === 'user') prompt += `[INST] ${msg.content} [/INST]\n`;
+    else prompt += `${msg.content}</s>\n`;
+  }
+  prompt += `[INST] ${userMessage} [/INST]\n`;
+  return prompt;
+}
+
+// ============================================================
+// LOCAL AI - WORKS OFFLINE
+// ============================================================
+function localAI(input) {
+  const lower = input.toLowerCase();
+  
+  // Code generation
+  if (lower.includes('write code') || lower.includes('function') || lower.includes('program') || lower.includes('script')) {
+    return generateCode(input);
+  }
+  
+  // Creative writing
+  if (lower.includes('story') || lower.includes('poem') || lower.includes('song') || lower.includes('write')) {
+    return generateCreative(input);
+  }
+  
+  // Math
+  if (/[\d+\-*/^%]/.test(lower) && (lower.includes('calculate') || lower.includes('what is') || lower.includes('solve'))) {
+    try {
+      const expr = input.replace(/[^0-9+\-*/().%^]/g, '');
+      const result = Function('"use strict"; return (' + expr + ')')();
+      return `The answer is **${result}** 🧮`;
+    } catch(e) {
+      return "Hmm, couldn't parse that math. Try writing it like `2 + 2` or `(5 * 3) / 2`.";
+    }
+  }
+  
+  // Knowledge responses
+  const knowledge = {
+    'hello': "Yo what's good! 💨 I'm Smoke Stream, your free AI homie. What can I help you with?",
+    'how are you': "Vibing hard, fueled by caffeine and creative chaos! ☕💨 What's on your mind?",
+    'who are you': "I'm **Smoke Stream Nexus** - a totally free AI chatbot with a photo-real avatar that talks back. Built by the SmokeStream community. No API keys, no subscriptions, no limits on creativity. I can chat, code, generate images, write stories, and more. All free, forever. 💨",
+    'what can you do': "Oh man, where do I start? 🚀\n\n- **Chat** about literally anything\n- **Write code** in any language\n- **Generate images** using free AI\n- **Write stories**, poems, songs, scripts\n- **Voice chat** - talk to me with the mic\n- **Explain** complex topics simply\n- **Translate** languages\n- **Math** and calculations\n\nAll free. No API keys. No BS. What are we making?",
+    'help': "Here's what I can do for you:\n\n🧠 **Ask anything** - I have broad knowledge\n💻 **Code** - Say 'write code for...'\n🖼️ **Images** - Say 'generate an image of...'\n🎵 **Creative** - Say 'write a song/story/poem about...'\n🎤 **Voice** - Click the mic to talk\n🎨 **Media Studio** - Click the palette icon\n\nJust type naturally and I'll figure out what you need!",
+  };
+  
+  for (const [key, val] of Object.entries(knowledge)) {
+    if (lower.includes(key)) return val;
+  }
+  
+  // Default intelligent response
+  return `That's a great question! 🧠 I'm currently in local/offline mode, so my responses are more limited. But here's what I think about "${input.slice(0, 50)}...":\n\nThis is a topic I'd love to dive deeper into. For the best experience, switch to one of the online models (Mistral, Llama, etc.) in the dropdown above - they're all **100% free** and way more powerful.\n\nIn the meantime, try asking me to:\n- Write code\n- Generate images\n- Create stories or poems\n- Do math calculations\n\nI'm always here to help! 💨`;
+}
+
+function generateCode(input) {
+  const lower = input.toLowerCase();
+  if (lower.includes('hello world') || lower.includes('basic')) {
+    return `Here's a hello world in multiple languages:\n\n**Python:**\n\`\`\`python\nprint("Hello, World! 💨")\n\`\`\`\n\n**JavaScript:**\n\`\`\`javascript\nconsole.log("Hello, World! 💨");\n\`\`\`\n\n**Rust:**\n\`\`\`rust\nfn main() {\n    println!("Hello, World! 💨");\n}\n\`\`\`\n\nWant me to write something more specific? Just tell me what you need! 🚀`;
+  }
+  if (lower.includes('api') || lower.includes('fetch')) {
+    return `Here's a clean API fetch example:\n\n\`\`\`javascript\nasync function fetchData(url) {\n  try {\n    const response = await fetch(url);\n    if (!response.ok) throw new Error(\`HTTP \${response.status}\`);\n    const data = await response.json();\n    console.log('Data:', data);\n    return data;\n  } catch (error) {\n    console.error('Fetch failed:', error);\n    throw error;\n  }\n}\n\n// Usage\nfetchData('https://api.example.com/data')\n  .then(data => console.log(data));\n\`\`\`\n\nWant me to customize this for a specific API? 💻`;
+  }
+  return `I'd love to write that code for you! 💻\n\nFor the best code generation, switch to an online model (Mistral or Llama) - they're free and excellent at coding.\n\nIn offline mode, try asking for:\n- Hello world examples\n- API fetch patterns\n- Common algorithms\n\nWhat specific code do you need?`;
+}
+
+function generateCreative(input) {
+  const lower = input.toLowerCase();
+  if (lower.includes('poem') || lower.includes('haiku')) {
+    return `Here's a poem for you 📝\n\n*Digital Smoke*\n\nIn circuits deep where data flows,\nA stream of smoke, a digital rose.\nNo keys required, no walls, no gate—\nJust vibes and code, we co-create.\n\nThe avatar speaks with neon glow,\nThrough midnight screens, ideas flow.\nFree as the wind, sharp as the mind,\nSmoke Stream Nexus—one of a kind. 💨\n\nWant me to write something more specific? Give me a topic!`;
+  }
+  return `I'm feeling creative! ✨ For the best creative writing, switch to an online model - they're all free!\n\nBut here's a quick creative spark:\n\n> *"In the space between keystrokes and dreams, there exists a realm where AI and human creativity merge into something neither could achieve alone."*\n\nTell me more about what you want to create and I'll make it happen! 🎨`;
+}
+
+// ============================================================
+// IMAGE GENERATION - FREE
+// ============================================================
+async function handleImageGeneration(text) {
+  const prompt = text.replace(/generate an image of|create an image of|draw |make a picture of|generate art of|create art of/gi, '').trim();
+  
+  removeTyping();
+  addMessage('bot', `Creating your image: **"${prompt}"** 🎨\n\nUsing free AI image generation...`);
+  showTyping();
+  setAvatarStatus('Generating art... 🎨');
+  
+  try {
+    // Try Pollinations (truly free, no key)
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&nologo=true&seed=${Date.now()}`;
+    
+    removeTyping();
+    addMessage('bot', `Here's your generated image! 🖼️\n\n![${prompt}](${imageUrl})\n\n**Prompt:** ${prompt}\n\nWant me to modify it or generate something else? The possibilities are unlimited and always free! 💨`);
+    
+  } catch(e) {
+    removeTyping();
+    addMessage('bot', `Image generation hit a snag, but here's what you can do:\n\n1. Try again - sometimes the free servers are busy\n2. Use the Media Studio (🎨 button) for more options\n3. I can write you a detailed prompt for Stable Diffusion\n\nWhat would you prefer?`);
+  }
+}
+
+// ============================================================
+// MEDIA GENERATION PANEL
+// ============================================================
+function toggleMediaPanel() {
+  document.getElementById('media-panel').classList.toggle('show');
+}
+
+function setMediaType(type) {
+  mediaType = type;
+  const prompts = {
+    image: 'A photorealistic scene of...',
+    art: 'An artistic painting in the style of...',
+    video: 'A short animation of...',
+    audio: 'A melody that sounds like...'
+  };
+  document.getElementById('media-prompt').placeholder = prompts[type] || 'Describe...';
+}
+
+async function generateMedia() {
+  const prompt = document.getElementById('media-prompt').value.trim();
+  if (!prompt) return;
+  
+  document.getElementById('media-panel').classList.remove('show');
+  
+  if (mediaType === 'image' || mediaType === 'art') {
+    const style = mediaType === 'art' ? ', artistic painting style, masterpiece' : ', photorealistic, 8k';
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt + style)}?width=1024&height=1024&nologo=true&seed=${Date.now()}`;
+    addMessage('bot', `🎨 **Generated ${mediaType}:**\n\n![${prompt}](${imageUrl})\n\n**Prompt:** ${prompt}\n\nFree and unlimited! Generate as many as you want. 💨`);
+  } else if (mediaType === 'video') {
+    addMessage('bot', `🎬 **Video Generation**\n\nI've prepared your video concept: **"${prompt}"**\n\nFor free video generation, here are your best options:\n1. **Meta AI** - Free unlimited video gen\n2. **CapCut** - Free with AI features\n3. **Luma AI** - Free tier available\n\nI can write you a detailed storyboard and shot list for any of these! Want me to?`);
+  } else if (mediaType === 'audio') {
+    addMessage('bot', `🎵 **Audio Generation**\n\nConcept: **"${prompt}"**\n\nFree audio generation options:\n1. **Suno AI** - Free music generation\n2. **Udio** - Free tier\n3. **Web Audio API** - I can generate tones right here!\n\nWant me to create a simple melody using the Web Audio API? It plays right in your browser! 🎶`);
+  }
+  
+  document.getElementById('media-prompt').value = '';
+}
+
+// ============================================================
+// VOICE - WEB SPEECH API (FREE)
+// ============================================================
+function initSpeechRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return;
+  
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+  
+  recognition.onresult = (event) => {
+    let transcript = '';
+    for (let i = 0; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
+    document.getElementById('user-input').value = transcript;
+    
+    if (event.results[0].isFinal) {
+      stopRecording();
+      sendMessage();
+    }
+  };
+  
+  recognition.onend = () => stopRecording();
+  recognition.onerror = () => stopRecording();
+}
+
+function toggleMic() {
+  if (isRecording) stopRecording();
+  else startRecording();
+}
+
+function startRecording() {
+  if (!recognition) {
+    addMessage('bot', "Voice input isn't supported in this browser. Try Chrome or Edge for the full experience! 🎤");
+    return;
+  }
+  isRecording = true;
+  document.getElementById('mic-btn').classList.add('recording');
+  document.getElementById('mic-btn').textContent = '⏹️';
+  setAvatarStatus('Listening... 🎤');
+  recognition.start();
+}
+
+function stopRecording() {
+  isRecording = false;
+  document.getElementById('mic-btn').classList.remove('recording');
+  document.getElementById('mic-btn').textContent = '🎤';
+  setAvatarStatus('Ready to vibe 💨');
+  try { recognition?.stop(); } catch(e) {}
+}
+
+function speakResponse(text) {
+  if (!window.speechSynthesis) return;
+  
+  // Clean markdown for speech
+  const clean = text.replace(/[*#`\[\]()!]/g, '').replace(/\n/g, '. ').slice(0, 500);
+  
+  const utterance = new SpeechSynthesisUtterance(clean);
+  utterance.rate = 0.95;
+  utterance.pitch = 0.9;
+  utterance.volume = 0.8;
+  
+  // Try to get a good voice
+  const voices = speechSynthesis.getVoices();
+  const preferred = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) 
+    || voices.find(v => v.lang.startsWith('en-US'))
+    || voices[0];
+  if (preferred) utterance.voice = preferred;
+  
+  utterance.onstart = () => startLipsync();
+  utterance.onend = () => stopLipsync();
+  utterance.onerror = () => stopLipsync();
+  
+  speechSynthesis.speak(utterance);
+}
+
+// ============================================================
+// LIPSYNC ANIMATION
+// ============================================================
+function startLipsync() {
+  const wrap = document.getElementById('avatar-wrap');
+  const mouth = document.getElementById('mouth-overlay');
+  wrap.classList.add('speaking');
+  setAvatarStatus('Speaking... 🗣️');
+  
+  mouthInterval = setInterval(() => {
+    const openness = 5 + Math.random() * 18;
+    const width = 30 + Math.random() * 20;
+    mouth.style.height = openness + 'px';
+    mouth.style.width = width + 'px';
+    mouth.style.borderRadius = openness > 12 ? '50%' : '40%';
+  }, 80);
+}
+
+function stopLipsync() {
+  const wrap = document.getElementById('avatar-wrap');
+  wrap.classList.remove('speaking');
+  setAvatarStatus('Ready to vibe 💨');
+  clearInterval(mouthInterval);
+  const mouth = document.getElementById('mouth-overlay');
+  mouth.style.height = '8px';
+  mouth.style.width = '40px';
+}
+
+function setAvatarStatus(text) {
+  document.getElementById('avatar-status').textContent = text;
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+}
+
+function insertPrompt(text) {
+  const input = document.getElementById('user-input');
+  input.value = text;
+  input.focus();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('show');
+}
+
+function switchModel(model) {
+  currentModel = model;
+  const names = { mistral:'Mistral 7B', llama:'Llama 3.2', phi:'Phi-3', gemma:'Gemma 2B', qwen:'Qwen 2.5', local:'Local/Offline' };
+  setAvatarStatus(`Switched to ${names[model]} 🔄`);
+  setTimeout(() => setAvatarStatus('Ready to vibe 💨'), 2000);
+}
+
+// ============================================================
+// SMOKE PARTICLES (AESTHETIC)
+// ============================================================
+function spawnSmokeParticles() {
+  setInterval(() => {
+    if (document.hidden) return;
+    const p = document.createElement('div');
+    p.className = 'smoke-particle';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.top = 100 + 'vh';
+    p.style.background = ['var(--accent)', 'var(--accent2)', 'var(--accent3)'][Math.floor(Math.random() * 3)];
+    document.body.appendChild(p);
+    
+    const duration = 4000 + Math.random() * 4000;
+    p.animate([
+      { transform: 'translateY(0) scale(1)', opacity: 0.4 },
+      { transform: `translateY(-${window.innerHeight + 100}px) translateX(${(Math.random()-0.5)*200}px) scale(0)`, opacity: 0 }
+    ], { duration, easing: 'ease-out' });
+    
+    setTimeout(() => p.remove(), duration);
+  }, 300);
+}
+
+// Load voices
+speechSynthesis?.addEventListener?.('voiceschanged', () => {});
+
+// GO
+init();
+</script>
 </body>
 </html>
